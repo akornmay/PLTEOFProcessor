@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xc:Partition xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xc="http://xdaq.web.cern.ch/xdaq/xsd/2004/XMLConfiguration-30" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <xc:Context url="http://%hostname%:%contextport%">  
+
+    <xc:Endpoint protocol="utcp" service="b2in" rmode="select" hostname="%hostname%" port="%utcpport%" network="utcp1" sndTimeout="2000" rcvTimeout="2000" affinity="RCV:P,SND:W,DSR:W,DSS:W" singleThread="true" publish="true"/>
+
+    <xc:Application class="pt::utcp::Application" id="20" instance="0" network="local" heartbeat="false" logpolicy="inherit">
+   <properties xmlns="urn:xdaq-application:pt::utcp::Application" xsi:type="soapenc:Struct">
+                 <maxClients xsi:type="xsd:unsignedInt">50</maxClients>
+                 <autoConnect xsi:type="xsd:boolean">false</autoConnect>
+                 <ioQueueSize xsi:type="xsd:unsignedInt">65536</ioQueueSize>
+                 <eventQueueSize xsi:type="xsd:unsignedInt">65536</eventQueueSize>
+                 <maxReceiveBuffers xsi:type="xsd:unsignedInt">266</maxReceiveBuffers>
+                 <maxBlockSize xsi:type="xsd:unsignedInt">65536</maxBlockSize>
+                 <committedPoolSize xsi:type="xsd:double">0x17580000</committedPoolSize>
+  </properties>
+ </xc:Application>
+ <xc:Module>${XDAQ_ROOT}/lib/libtcpla.so</xc:Module>
+ <xc:Module>${XDAQ_ROOT}/lib/libptutcp.so</xc:Module>
+
+    <xc:Application class="eventing::core::Subscriber" id="109" instance="0" network="utcp1" group="b2in" service="eventing-subscriber" bus="brildata">
+      <properties xmlns="urn:xdaq-application:eventing::core::Subscriber" xsi:type="soapenc:Struct">
+	<eventings xsi:type="soapenc:Array" soapenc:arrayType="xsd:ur-type[1]">
+	  <item xsi:type="xsd:string" soapenc:position="[0]">utcp://srv-s2d16-32-01.cms:8181</item>
+	</eventings>       
+      </properties>
+    </xc:Application>
+    <xc:Module>${XDAQ_ROOT}/lib/libb2inutils.so</xc:Module>
+    <xc:Module>${XDAQ_ROOT}/lib/libeventingcore.so</xc:Module>
+    
+    <xc:Application class="eventing::core::Publisher" id="16" instance="0" network="utcp1" group="b2in" service="eventing-publisher" bus="brildata">
+      <properties xmlns="urn:xdaq-application:eventing::core::Publisher" xsi:type="soapenc:Struct">
+	<eventings xsi:type="soapenc:Array" soapenc:arrayType="xsd:ur-type[1]">
+	  <item xsi:type="xsd:string" soapenc:position="[0]">utcp://srv-s2d16-32-01.cms:8181</item>
+	</eventings>
+      </properties>
+    </xc:Application> 
+    
+    <xc:Application class="bril::mypackage::plteofprocessor"  id="101" instance="0" network="local" logpolicy="inherit">
+      <properties xmlns="urn:xdaq-application:bril::mypackage::SmartDataSource" xsi:type="soapenc:Struct">
+	<bus xsi:type="xsd:string">brildata</bus>
+	<workloopHost xsi:type="xsd:string">tcp://vmepc-s2d16-07-01.cms:5556</workloopHost>
+	<slinkHost xsi:type="xsd:string">tcp://pltslink.cms:7776</slinkHost>
+	<gcFile xsi:type="xsd:string">/nfshome0/nfilipov/daq/bril/mypackage/data/GainCalFits_20170518.143905.dat</gcFile>
+	<alFile xsi:type="xsd:string">/nfshome0/nfilipov/daq/bril/mypackage/data/Trans_Alignment_2017MagnetOn_Prelim.dat</alFile>
+	<trackFile xsi:type="xsd:string">/nfshome0/nfilipov/daq/bril/mypackage/data/tracks_2017.csv</trackFile>
+	<pixMask xsi:type="xsd:string">/nfshome0/nfilipov/daq/bril/mypackage/data/Mask_2016_VdM_v1.txt</pixMask>
+	<baseDir xsi:type="xsd:string">/nfshome0/nfilipov/daq/bril/test_data</baseDir>
+	<calibVal xsi:type="xsd:float">1.0</calibVal>
+      </properties>
+    </xc:Application>
+    <xc:Module>${XDAQ_ROOT}/lib/libeventingapi.so</xc:Module>
+    <xc:Module>%localdaqroot%/lib/libbrilmypackage.so</xc:Module>
+
+  </xc:Context>
+
+</xc:Partition>

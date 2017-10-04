@@ -1,0 +1,4 @@
+%hostname%=`hostname -f`
+%contextport%=6868
+%utcpport%=6867
+%localdaqroot%=

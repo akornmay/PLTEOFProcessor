@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xc:Partition xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xc="http://xdaq.web.cern.ch/xdaq/xsd/2004/XMLConfiguration-30" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <xc:Context url="http://%hostname%:%contextport%">  
+    <xc:Application class="bril::mypackage::SmartDataSource"  id="101" instance="0" network="local" logpolicy="inherit">
+      <properties xmlns="urn:xdaq-application:bril::mypackage::SmartDataSource" xsi:type="soapenc:Struct">
+	<maxqueuesize xsi:type="xsd:unsignedInt">10</maxqueuesize>
+        <pushintervalsec xsi:type="xsd:float">1.5</pushintervalsec>
+      </properties>
+    </xc:Application>
+    <xc:Module>%localdaqroot%/lib/libbrilmypackage.so</xc:Module>
+
+  </xc:Context>
+
+</xc:Partition>

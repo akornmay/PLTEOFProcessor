@@ -1,0 +1,66 @@
+# $Id$
+BUILD_HOME:=$(shell pwd)/../../..
+include $(XDAQ_ROOT)/config/mfAutoconf.rules
+include $(XDAQ_ROOT)/config/mfDefs.$(XDAQ_OS)
+include $(XDAQ_ROOT)/config/mfDefs.extern_coretools
+include $(XDAQ_ROOT)/config/mfDefs.coretools
+include $(XDAQ_ROOT)/config/mfDefs.extern_powerpack
+include $(XDAQ_ROOT)/config/mfDefs.powerpack
+include $(XDAQ_ROOT)/config/mfDefs.bril_worksuite
+##package
+Project=daq
+Package=bril/mypackage
+ifeq ($(XDAQ_PLATFORM),x86_64_slc6)
+	ROOT_PREFIX = /opt/root/hcal-root-5.28.00f-gcc44
+endif
+ifeq ($(XDAQ_PLATFORM),x86_64_centos7)
+	ROOT_PREFIX = /opt/root/hcal-root-5.34.36-gcc485
+endif
+ROOT_INCLUDE_PREFIX = $(ROOT_PREFIX)/include
+##sources
+Sources = $(wildcard src/common/*.cc)
+
+#
+# Source files
+#
+
+
+##dirs
+IncludeDirs = \
+	$(ROOT_INCLUDE_PREFIX) \
+	$(XI2O_UTILS_INCLUDE_PREFIX) \
+	$(XERCES_INCLUDE_PREFIX) \
+	$(LOG4CPLUS_INCLUDE_PREFIX) \
+	$(CGICC_INCLUDE_PREFIX) \
+	$(XCEPT_INCLUDE_PREFIX) \
+	$(CONFIG_INCLUDE_PREFIX) \
+	$(TOOLBOX_INCLUDE_PREFIX) \
+	$(PT_INCLUDE_PREFIX) \
+	$(XDAQ_INCLUDE_PREFIX) \
+	$(XDATA_INCLUDE_PREFIX) \
+	$(XOAP_INCLUDE_PREFIX) \
+	$(XGI_INCLUDE_PREFIX) \
+	$(I2O_INCLUDE_PREFIX) \
+	$(XI2O_INCLUDE_PREFIX) \
+	$(B2IN_NUB_INCLUDE_PREFIX) \
+	$(INTERFACE_BRIL_INCLUDE_PREFIX)
+
+LibraryDirs = 
+UserSourcePath =
+UserCFlags =
+UserCCFlags =
+UserDynamicLinkFlags =
+UserStaticLinkFlags =
+UserExecutableLinkFlags =
+##libs
+Libraries =
+ExternalObjects = 
+DependentLibraryDirs = /usr/lib64 /opt/root/hcal-root-5.34.36-gcc485/lib
+DependentLibraries = Core Hist HistPainter zmq
+##compile
+DynamicLibrary=brilmypackage
+StaticLibrary=
+TestLibraries=
+TestExecutables=
+include $(XDAQ_ROOT)/config/Makefile.rules
+include $(XDAQ_ROOT)/config/mfRPM.rules
