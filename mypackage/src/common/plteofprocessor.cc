@@ -18,7 +18,7 @@
 #include "xcept/tools.h"
 //topics
 #include "interface/bril/PLTTopics.hh"
-#include "interface/bril/BCM1FTopics.hh"
+//#include "interface/bril/BCM1FTopics.hh"
 //for slink data
 #include "bril/mypackage/PLTEvent.h"
 #include "interface/bril/PLTSlinkTopics.hh"
@@ -62,13 +62,13 @@ namespace bril{
       }
       
       //create workloops
-      toolbox::net::URN publishlumiwlurn( "publishlumi_wl", getApplicationDescriptor()->getURN() );
+      /*      toolbox::net::URN publishlumiwlurn( "publishlumi_wl", getApplicationDescriptor()->getURN() );
       m_publishlumi_wl = toolbox::task::getWorkLoopFactory()->getWorkLoop(publishlumiwlurn.toString() ,"waiting");
-      m_publishlumi_wl_as = toolbox::task::bind(this,&bril::mypackage::plteofprocessor::publishlumi ,"publishlumi");
+      m_publishlumi_wl_as = toolbox::task::bind(this,&bril::mypackage::plteofprocessor::publishlumi ,"publishlumi"); */
 
-      toolbox::net::URN publishbkgwlurn( "publishbkg_wl", getApplicationDescriptor()->getURN() );
+      /*    toolbox::net::URN publishbkgwlurn( "publishbkg_wl", getApplicationDescriptor()->getURN() );
       m_publishbkg_wl = toolbox::task::getWorkLoopFactory()->getWorkLoop(publishbkgwlurn.toString() ,"waiting");
-      m_publishbkg_wl_as = toolbox::task::bind(this,&bril::mypackage::plteofprocessor::publishbkg,"publishbkg");
+      m_publishbkg_wl_as = toolbox::task::bind(this,&bril::mypackage::plteofprocessor::publishbkg,"publishbkg"); */
 
       toolbox::net::URN writetofileurn( "writetofile_wl", getApplicationDescriptor()->getURN() );  
       m_writetofile_wl = toolbox::task::getWorkLoopFactory()->getWorkLoop(writetofileurn.toString() ,"waiting");    
@@ -365,7 +365,7 @@ namespace bril{
 	      //	      std::cout<< channelEff<<",";	      
 	      //	      std::cout << channelEff<<",";
 	      // sstream << validChannels[i] <<","<< acc << ",";
-	      std::cout<< acc <<",";
+	      //   std::cout<< channelEff <<",";
 	    }
 	    // myslinkfile << sstream.str() << std::endl;
 	    // myslinkfile.close();
@@ -392,7 +392,7 @@ namespace bril{
       fn << m_fillnum <<".csv";	 
       tmp_fn = fn.str();
 
-      //write to file as soon as it is stable beams, every 4Nb
+      //write to file as soon as it is stable beams, every LS
       if (m_beamstatus == "STABLE BEAMS"){
 	//tofile
 	myfile.open(tmp_fn.c_str(), std::ios::app);
@@ -404,7 +404,7 @@ namespace bril{
     }
     
     bool plteofprocessor::publishlumi( toolbox::task::WorkLoop* wl ){
-      usleep(100000);
+      /*      usleep(100000);
       if(m_canpublish){
 
 	float avgraw = 0;
@@ -436,7 +436,6 @@ namespace bril{
 	
 	xdata::Properties plist;
 	plist.setProperty("DATA_VERSION",interface::bril::DATA_VERSION);
-	plist.setProperty("PAYLOAD_DICT",interface::bril::bcm1fbkgT::payloaddict());
 	if( m_beamstatus!="STABLE BEAMS"&&m_beamstatus!="SQUEEZE"&&m_beamstatus!="FLAT TOP"&&m_beamstatus!="ADJUST"){
 	  plist.setProperty("NOSTORE","1");
 	}
@@ -472,12 +471,12 @@ namespace bril{
 	  notifyQualified("error",myerrorobj);
 	}
 	
-      }      
+	} */     
       return false;
     }
     
     bool plteofprocessor::publishbkg( toolbox::task::WorkLoop* wl ){
-      usleep(100000);
+      /*      usleep(100000);
       if(m_canpublish){	
 
 	float plusz = 0;
@@ -526,7 +525,7 @@ namespace bril{
 	  XCEPT_DECLARE_NESTED(bril::mypackage::exception::Exception,myerrorobj,"Failed to publish bcm1fbkg to "+m_bus.toString(),e);
 	  notifyQualified("error",myerrorobj);
 	}
-      }
+	}*/
       return false;
     }
     

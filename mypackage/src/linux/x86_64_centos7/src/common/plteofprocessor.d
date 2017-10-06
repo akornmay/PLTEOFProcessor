@@ -425,7 +425,6 @@
  /opt/xdaq/include/interface/bril/CommonDataFormat.h \
  /opt/xdaq/include/interface/bril/CompoundDataStreamer.h \
  /opt/xdaq/include/interface/bril/Utils.h \
- /opt/xdaq/include/interface/bril/BCM1FTopics.hh \
  /cmsnfshome0/nfshome0/nfilipov/daq/bril/mypackage/include/bril/mypackage/PLTEvent.h \
  /opt/xdaq/include/interface/bril/PLTSlinkTopics.hh \
  /cmsnfshome0/nfshome0/nfilipov/daq/bril/mypackage/include/bril/mypackage/zmq.hpp
@@ -875,7 +874,6 @@ src/common/plteofprocessor.cc:
 /opt/xdaq/include/interface/bril/CommonDataFormat.h:
 /opt/xdaq/include/interface/bril/CompoundDataStreamer.h:
 /opt/xdaq/include/interface/bril/Utils.h:
-/opt/xdaq/include/interface/bril/BCM1FTopics.hh:
 /cmsnfshome0/nfshome0/nfilipov/daq/bril/mypackage/include/bril/mypackage/PLTEvent.h:
 /opt/xdaq/include/interface/bril/PLTSlinkTopics.hh:
 /cmsnfshome0/nfshome0/nfilipov/daq/bril/mypackage/include/bril/mypackage/zmq.hpp:
