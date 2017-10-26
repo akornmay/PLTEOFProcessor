@@ -44,6 +44,12 @@ namespace bril{
 	~NB4ChangedEvent(){}
       };
 
+      class FillDumpedEvent : public toolbox::Event{
+      public:
+      FillDumpedEvent():toolbox::Event("urn:bril-mypackage-event:FillDumped",0){}
+	~FillDumpedEvent(){}
+      };
+
     }
 }
 #endif

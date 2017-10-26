@@ -32,6 +32,7 @@
 
 #include "bril/mypackage/EventAnalyzer.h"
 
+#include "bril/mypackage/ROC_Efficiency.h"
 
 namespace bril{
   namespace mypackage{
@@ -69,6 +70,8 @@ namespace bril{
 	bool publishlumi( toolbox::task::WorkLoop* wl );
 	bool publishbkg( toolbox::task::WorkLoop* wl );
 	bool writetofile( toolbox::task::WorkLoop* wl );
+	bool roc_efficiency( toolbox::task::WorkLoop* wl );
+	bool roc_accidentals( toolbox::task::WorkLoop* wl );
 	
 	//configuration parameters
 	xdata::String m_bus;
@@ -111,6 +114,12 @@ namespace bril{
 	// workloop writing pltzero avgrawlumi and avglumi to file;
 	toolbox::task::WorkLoop* m_writetofile_wl;
 	toolbox::task::ActionSignature* m_writetofile_wl_as;
+	// workloop for efficiency 
+	toolbox::task::WorkLoop* m_roc_efficiency_wl;
+	toolbox::task::ActionSignature* m_roc_efficiency_wl_as;
+	// workloop for accidentals 
+	toolbox::task::WorkLoop* m_roc_accidentals_wl;
+	toolbox::task::ActionSignature* m_roc_accidentals_wl_as;
 
 	void stopTimer();
 	void startTimer();

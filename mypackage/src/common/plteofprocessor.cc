@@ -74,6 +74,14 @@ namespace bril{
       m_writetofile_wl = toolbox::task::getWorkLoopFactory()->getWorkLoop(writetofileurn.toString() ,"waiting");    
       m_writetofile_wl_as = toolbox::task::bind(this,&bril::mypackage::plteofprocessor::writetofile ,"writetofile");
 
+      toolbox::net::URN roc_accidentalsurn( "roc_accidentals_wl", getApplicationDescriptor()->getURN() );  
+      m_roc_accidentals_wl = toolbox::task::getWorkLoopFactory()->getWorkLoop(roc_accidentalsurn.toString() ,"waiting");
+      m_roc_accidentals_wl_as = toolbox::task::bind(this,&bril::mypackage::plteofprocessor::roc_accidentals,"roc_accidentals"); 
+
+      toolbox::net::URN roc_efficiencyurn( "roc_efficiency_wl", getApplicationDescriptor()->getURN() );     
+      m_roc_efficiency_wl = toolbox::task::getWorkLoopFactory()->getWorkLoop(roc_efficiencyurn.toString() ,"waiting");     
+      m_roc_efficiency_wl_as = toolbox::task::bind(this,&bril::mypackage::plteofprocessor::roc_efficiency,"roc_efficiency"); 
+      
       //create application memory pool for outgoing messages
       toolbox::net::URN memurn("toolbox-mem-pool",getApplicationDescriptor()->getURN());
       try{
@@ -129,7 +137,9 @@ namespace bril{
 	//	m_publishlumi_wl->submit( m_publishlumi_wl_as );	
       }else if( e.type() == "urn:bril-mypackage-event:NB4Changed" ){
 	//	m_publishbkg_wl->submit( m_publishbkg_wl_as );	    
-
+      }else if( e.type() == "urn:bril-mypackage-event:FillDumped"){
+		m_roc_efficiency_wl->submit( m_roc_efficiency_wl_as);
+		m_roc_accidentals_wl->submit(m_roc_accidentals_wl_as);
       }
     }
 
@@ -251,7 +261,7 @@ namespace bril{
     void plteofprocessor::timeExpired(toolbox::task::TimerEvent & e)
     {
       LOG4CPLUS_INFO(getApplicationLogger(),"Beginning zmq listener");
-      zmqClient();
+      //      zmqClient();
     }
 
     void plteofprocessor::zmqClient()
@@ -365,7 +375,7 @@ namespace bril{
 	      //	      std::cout<< channelEff<<",";	      
 	      //	      std::cout << channelEff<<",";
 	      // sstream << validChannels[i] <<","<< acc << ",";
-	      //   std::cout<< channelEff <<",";
+	      std::cout<< eff[0] <<",";
 	    }
 	    // myslinkfile << sstream.str() << std::endl;
 	    // myslinkfile.close();
@@ -403,6 +413,31 @@ namespace bril{
       return false;
     }
     
+    bool plteofprocessor::roc_efficiency( toolbox::task::WorkLoop* wl){
+      usleep(100000);
+
+      std::ofstream myfile;
+      std::stringstream sstream;
+      std::string tmp_fn;
+      std::stringstream fn;
+      fn <<"efficiency"<< m_fillnum <<  ".csv";
+      std::string DataFileName = "Slink_20170924.111114.dat";
+      std::string GainCalFile = "GainCalFits_20170518.143905.dat";
+      std::string TrackDist = "TrackDistributions_MagnetOn2017_5718.txt";
+      std::string Alignment = "Trans_Alignment_2017MagnetOn_Prelim.dat";
+      if (m_beamstatus=="INJECTION PROBE BEAM"){
+	//      myfile.open(fn.c_str(),std::ios::app);
+	LOG4CPLUS_INFO(getApplicationLogger(), "Computing efficiency");	
+	TrackingEfficiency(DataFileName, GainCalFile, Alignment);
+	LOG4CPLUS_INFO(getApplicationLogger(), "DONE");
+      }
+      return false;
+    }
+
+    bool plteofprocessor::roc_accidentals( toolbox::task::WorkLoop*wl){
+      usleep(100000);
+      return false;
+    }
     bool plteofprocessor::publishlumi( toolbox::task::WorkLoop* wl ){
       /*      usleep(100000);
       if(m_canpublish){
