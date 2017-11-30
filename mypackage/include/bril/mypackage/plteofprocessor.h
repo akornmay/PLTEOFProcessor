@@ -77,6 +77,7 @@ namespace bril{
 	xdata::String m_bus;
 	//data cache
 	std::string m_beamstatus;
+	std::string m_new_bs;
 	std::map< unsigned int, std::vector<unsigned short> > m_mylumihist; // channelid, bunchhist
 	std::map< unsigned int, std::vector<unsigned short> > m_mybkghist; //channelid, bunchhist
 	unsigned int m_fillnum;

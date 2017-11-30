@@ -44,6 +44,7 @@ namespace bril{
       m_nbnum = 0;
       m_filename = "PLTLumiZero_"; // expanded afterwards with fill number
       m_canpublish = false;
+      m_new_bs = "";
 
       getApplicationInfoSpace()->fireItemAvailable("bus",&m_bus );      
       getApplicationInfoSpace()->fireItemAvailable("workloopHost", &m_workloopHost);
@@ -124,6 +125,7 @@ namespace bril{
 	// m_publishlumi_wl->activate();
 	//	m_publishbkg_wl->activate();
 	m_writetofile_wl->activate();
+	m_roc_efficiency_wl->activate();
 
       }
     }
@@ -144,15 +146,15 @@ namespace bril{
     }
 
     void plteofprocessor::onMessage( toolbox::mem::Reference* ref, xdata::Properties& plist ) throw ( b2in::nub::exception::Exception ){
-
+      
       toolbox::mem::AutoReference refguard(ref); //IMPORTANT: guarantee ref is released when refguard is out of scope
-
+      
       std::string action = plist.getProperty("urn:b2in-eventing:action");
       if ( action == "notify" && ref!=0 ){      
 	std::string topic = plist.getProperty("urn:b2in-eventing:topic");
 	LOG4CPLUS_DEBUG(getApplicationLogger(), "Received topic " +topic);
 	if( topic == "beam" ){
-
+	  
 	  interface::bril::DatumHead* thead = (interface::bril::DatumHead*)(ref->getDataLocation());   
 	  std::string payloaddict = plist.getProperty("PAYLOAD_DICT");
 
@@ -160,6 +162,20 @@ namespace bril{
 	  char bstatus[28];
 	  tc.extract_field( bstatus , "status", thead->payloadanchor );
 	  m_beamstatus = std::string(bstatus);
+
+	  if (m_beamstatus != m_new_bs ){
+	    std::stringstream ss;
+	    LOG4CPLUS_INFO( getApplicationLogger(), ss.str() );	
+	    m_new_bs = m_beamstatus;
+	    ss<<"[nF] BEAM MODE CHANGED TO "<<m_new_bs;
+	    LOG4CPLUS_INFO(getApplicationLogger(),ss.str());	
+	    
+	    //  if (m_new_bs == "BEAM DUMP"){
+	    bril::mypackage::FillDumpedEvent filldumpevent;
+	    this->fireEvent( filldumpevent );
+	    LOG4CPLUS_INFO (getApplicationLogger(), "[nF] FIRED FILLDUMPEDEVENT");
+	    // }
+	  }
 	}else if( topic == "pltlumizero" ){
 
 	  interface::bril::DatumHead* thead = (interface::bril::DatumHead*)(ref->getDataLocation());   
@@ -174,24 +190,6 @@ namespace bril{
 	  m_nbnum = thead->nbnum;	  
 	  m_timestampsec = thead->timestampsec;
 	  m_timestampmsec = thead->timestampmsec;
-
-	  // unsigned int algoid = thead->getAlgoID();
-	  // unsigned int channelid = thead->getChannelID();	 
-	  //	  LOG4CPLUS_INFO(getApplicationLogger(), "Algo ID " +algoid);
-	  //	  LOG4CPLUS_INFO(getApplicationLogger(), "Channel ID " +channelid);
-
-	  // LOG4CPLUS_INFO( getApplicationLogger(), ss.str() );	
-
-	  // if( previousfill!=m_fillnum ){ // fill number changes, we close the previous file stream and open a new one.
-	  //   if (!tofile.is_open()){ 
-	  //     std::string file = m_filename;// + std::string(m_fillnum);
-	  //     file+=".csv";
-      	  //     tofile.open(file.c_str());
-	  //	  std::stringstream info;
-	  //     info << "STARTED new EOFProcessor file "<< file;
-	  //     LOG4CPLUS_INFO (getApplicationLogger(), info.str());
-	  //   }
-	  // }
 
 	  float avgraw = 0;
 	  float avg = 0;
@@ -220,12 +218,6 @@ namespace bril{
 	    bril::mypackage::LumiSectionChangedEvent myevent;
 	    this->fireEvent( myevent );
 	  }
-	  
-	  // if( previousls!=0 && (m_lsnum!=previousls ) ){
-	  //   bril::mypackage::LumiSectionChangedEvent myevent;
-	  //   this->fireEvent( myevent );
-	  // }
-	  
 	}
       }      
     }
@@ -401,7 +393,7 @@ namespace bril{
       std::stringstream fn;	 
       fn << m_fillnum <<".csv";	 
       tmp_fn = fn.str();
-
+      
       //write to file as soon as it is stable beams, every LS
       if (m_beamstatus == "STABLE BEAMS"){
 	//tofile
@@ -410,32 +402,58 @@ namespace bril{
 	myfile << thread.str() << std::endl;
 	myfile.close();
       }
+
       return false;
     }
     
     bool plteofprocessor::roc_efficiency( toolbox::task::WorkLoop* wl){
       usleep(100000);
 
-      std::ofstream myfile;
-      std::stringstream sstream;
+      std::ifstream myfile;
+      std::stringstream sstream; /// non usato
       std::string tmp_fn;
       std::stringstream fn;
-      fn <<"efficiency"<< m_fillnum <<  ".csv";
-      std::string DataFileName = "Slink_20170924.111114.dat";
+      //      fn <<"roc_eff"<< m_fillnum <<  ".csv";
+      tmp_fn = "roc_eff.csv";
+      std::string DataFileName = "/scratch/delannoy/Slink_20170924.111114.dat";
       std::string GainCalFile = "GainCalFits_20170518.143905.dat";
       std::string TrackDist = "TrackDistributions_MagnetOn2017_5718.txt";
       std::string Alignment = "Trans_Alignment_2017MagnetOn_Prelim.dat";
-      if (m_beamstatus=="INJECTION PROBE BEAM"){
+      /*      if (m_beamstatus=="BEAM DUMP"){
 	//      myfile.open(fn.c_str(),std::ios::app);
 	LOG4CPLUS_INFO(getApplicationLogger(), "Computing efficiency");	
-	TrackingEfficiency(DataFileName, GainCalFile, Alignment);
-	LOG4CPLUS_INFO(getApplicationLogger(), "DONE");
-      }
+	LOG4CPLUS_INFO(getApplicationLogger(), "EFFICIENCY DONE");
+	}*/
+
+      std::string line;
+      LOG4CPLUS_INFO(getApplicationLogger(),"  Beginning ROC efficiency computation");	
+      TrackingEfficiency(DataFileName, GainCalFile, Alignment);
+      LOG4CPLUS_INFO(getApplicationLogger(),"  EFFICIENCY DONE");	
+      
+      myfile.open(tmp_fn.c_str(), std::ios::in);
+      if (myfile.is_open())
+	{
+	  while( getline (myfile, line) )
+	    {
+	      cout << line << '\n';
+	    }
+	  myfile.close();
+	}
+      else cout << "Unable to open file";
+      /// taking last roc_eff.csv and inputting it to the fill luminosity
+      
       return false;
     }
 
     bool plteofprocessor::roc_accidentals( toolbox::task::WorkLoop*wl){
       usleep(100000);
+      if (m_beamstatus=="BEAM DUMP"){
+	//      myfile.open(fn.c_str(),std::ios::app);
+	LOG4CPLUS_INFO(getApplicationLogger(), "Computing accidentals");	
+	//	TrackingEfficiency(DataFileName, GainCalFile, Alignment);
+	LOG4CPLUS_INFO(getApplicationLogger(), "ACCIDENTALS DONE");
+      }
+
       return false;
     }
     bool plteofprocessor::publishlumi( toolbox::task::WorkLoop* wl ){
